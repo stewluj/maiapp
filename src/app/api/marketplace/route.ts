@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const { title, description, price, category, condition } = await req.json();
+  const { title, description, price, category, condition, imageUrl } = await req.json();
 
   if (!title || !category) {
     return NextResponse.json({ error: "Title and category are required" }, { status: 400 });
@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
       category,
       type: "SELLING",
       condition,
+      imageUrl: imageUrl || null,
       sellerId: user.id,
       universityId: user.universityId,
     },

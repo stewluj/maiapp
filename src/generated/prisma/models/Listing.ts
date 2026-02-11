@@ -292,6 +292,7 @@ export type ListingWhereInput = {
   seller?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   university?: Prisma.XOR<Prisma.UniversityNullableScalarRelationFilter, Prisma.UniversityWhereInput> | null
   conversations?: Prisma.ConversationListRelationFilter
+  reviews?: Prisma.ReviewListRelationFilter
 }
 
 export type ListingOrderByWithRelationInput = {
@@ -313,6 +314,7 @@ export type ListingOrderByWithRelationInput = {
   seller?: Prisma.UserOrderByWithRelationInput
   university?: Prisma.UniversityOrderByWithRelationInput
   conversations?: Prisma.ConversationOrderByRelationAggregateInput
+  reviews?: Prisma.ReviewOrderByRelationAggregateInput
 }
 
 export type ListingWhereUniqueInput = Prisma.AtLeast<{
@@ -337,6 +339,7 @@ export type ListingWhereUniqueInput = Prisma.AtLeast<{
   seller?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   university?: Prisma.XOR<Prisma.UniversityNullableScalarRelationFilter, Prisma.UniversityWhereInput> | null
   conversations?: Prisma.ConversationListRelationFilter
+  reviews?: Prisma.ReviewListRelationFilter
 }, "id">
 
 export type ListingOrderByWithAggregationInput = {
@@ -397,6 +400,7 @@ export type ListingCreateInput = {
   seller: Prisma.UserCreateNestedOneWithoutListingsInput
   university?: Prisma.UniversityCreateNestedOneWithoutListingsInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutListingInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutListingInput
 }
 
 export type ListingUncheckedCreateInput = {
@@ -415,6 +419,7 @@ export type ListingUncheckedCreateInput = {
   sellerId: string
   universityId?: string | null
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutListingInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutListingInput
 }
 
 export type ListingUpdateInput = {
@@ -433,6 +438,7 @@ export type ListingUpdateInput = {
   seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   university?: Prisma.UniversityUpdateOneWithoutListingsNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutListingNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateInput = {
@@ -451,6 +457,7 @@ export type ListingUncheckedUpdateInput = {
   sellerId?: Prisma.StringFieldUpdateOperationsInput | string
   universityId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutListingNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutListingNestedInput
 }
 
 export type ListingCreateManyInput = {
@@ -737,6 +744,22 @@ export type ListingUpdateOneWithoutConversationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ListingUpdateToOneWithWhereWithoutConversationsInput, Prisma.ListingUpdateWithoutConversationsInput>, Prisma.ListingUncheckedUpdateWithoutConversationsInput>
 }
 
+export type ListingCreateNestedOneWithoutReviewsInput = {
+  create?: Prisma.XOR<Prisma.ListingCreateWithoutReviewsInput, Prisma.ListingUncheckedCreateWithoutReviewsInput>
+  connectOrCreate?: Prisma.ListingCreateOrConnectWithoutReviewsInput
+  connect?: Prisma.ListingWhereUniqueInput
+}
+
+export type ListingUpdateOneWithoutReviewsNestedInput = {
+  create?: Prisma.XOR<Prisma.ListingCreateWithoutReviewsInput, Prisma.ListingUncheckedCreateWithoutReviewsInput>
+  connectOrCreate?: Prisma.ListingCreateOrConnectWithoutReviewsInput
+  upsert?: Prisma.ListingUpsertWithoutReviewsInput
+  disconnect?: Prisma.ListingWhereInput | boolean
+  delete?: Prisma.ListingWhereInput | boolean
+  connect?: Prisma.ListingWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ListingUpdateToOneWithWhereWithoutReviewsInput, Prisma.ListingUpdateWithoutReviewsInput>, Prisma.ListingUncheckedUpdateWithoutReviewsInput>
+}
+
 export type ListingCreateWithoutUniversityInput = {
   id?: string
   title: string
@@ -752,6 +775,7 @@ export type ListingCreateWithoutUniversityInput = {
   course?: Prisma.CourseCreateNestedOneWithoutListingsInput
   seller: Prisma.UserCreateNestedOneWithoutListingsInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutListingInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutListingInput
 }
 
 export type ListingUncheckedCreateWithoutUniversityInput = {
@@ -769,6 +793,7 @@ export type ListingUncheckedCreateWithoutUniversityInput = {
   courseId?: string | null
   sellerId: string
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutListingInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutListingInput
 }
 
 export type ListingCreateOrConnectWithoutUniversityInput = {
@@ -831,6 +856,7 @@ export type ListingCreateWithoutSellerInput = {
   course?: Prisma.CourseCreateNestedOneWithoutListingsInput
   university?: Prisma.UniversityCreateNestedOneWithoutListingsInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutListingInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutListingInput
 }
 
 export type ListingUncheckedCreateWithoutSellerInput = {
@@ -848,6 +874,7 @@ export type ListingUncheckedCreateWithoutSellerInput = {
   courseId?: string | null
   universityId?: string | null
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutListingInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutListingInput
 }
 
 export type ListingCreateOrConnectWithoutSellerInput = {
@@ -890,6 +917,7 @@ export type ListingCreateWithoutCourseInput = {
   seller: Prisma.UserCreateNestedOneWithoutListingsInput
   university?: Prisma.UniversityCreateNestedOneWithoutListingsInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutListingInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutListingInput
 }
 
 export type ListingUncheckedCreateWithoutCourseInput = {
@@ -907,6 +935,7 @@ export type ListingUncheckedCreateWithoutCourseInput = {
   sellerId: string
   universityId?: string | null
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutListingInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutListingInput
 }
 
 export type ListingCreateOrConnectWithoutCourseInput = {
@@ -949,6 +978,7 @@ export type ListingCreateWithoutConversationsInput = {
   course?: Prisma.CourseCreateNestedOneWithoutListingsInput
   seller: Prisma.UserCreateNestedOneWithoutListingsInput
   university?: Prisma.UniversityCreateNestedOneWithoutListingsInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutListingInput
 }
 
 export type ListingUncheckedCreateWithoutConversationsInput = {
@@ -966,6 +996,7 @@ export type ListingUncheckedCreateWithoutConversationsInput = {
   courseId?: string | null
   sellerId: string
   universityId?: string | null
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutListingInput
 }
 
 export type ListingCreateOrConnectWithoutConversationsInput = {
@@ -999,6 +1030,7 @@ export type ListingUpdateWithoutConversationsInput = {
   course?: Prisma.CourseUpdateOneWithoutListingsNestedInput
   seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   university?: Prisma.UniversityUpdateOneWithoutListingsNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateWithoutConversationsInput = {
@@ -1016,6 +1048,95 @@ export type ListingUncheckedUpdateWithoutConversationsInput = {
   courseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellerId?: Prisma.StringFieldUpdateOperationsInput | string
   universityId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutListingNestedInput
+}
+
+export type ListingCreateWithoutReviewsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  price?: number | null
+  category: $Enums.ListingCategory
+  type: $Enums.ListingType
+  condition?: string | null
+  imageUrl?: string | null
+  status?: $Enums.ListingStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  course?: Prisma.CourseCreateNestedOneWithoutListingsInput
+  seller: Prisma.UserCreateNestedOneWithoutListingsInput
+  university?: Prisma.UniversityCreateNestedOneWithoutListingsInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutListingInput
+}
+
+export type ListingUncheckedCreateWithoutReviewsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  price?: number | null
+  category: $Enums.ListingCategory
+  type: $Enums.ListingType
+  condition?: string | null
+  imageUrl?: string | null
+  status?: $Enums.ListingStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courseId?: string | null
+  sellerId: string
+  universityId?: string | null
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutListingInput
+}
+
+export type ListingCreateOrConnectWithoutReviewsInput = {
+  where: Prisma.ListingWhereUniqueInput
+  create: Prisma.XOR<Prisma.ListingCreateWithoutReviewsInput, Prisma.ListingUncheckedCreateWithoutReviewsInput>
+}
+
+export type ListingUpsertWithoutReviewsInput = {
+  update: Prisma.XOR<Prisma.ListingUpdateWithoutReviewsInput, Prisma.ListingUncheckedUpdateWithoutReviewsInput>
+  create: Prisma.XOR<Prisma.ListingCreateWithoutReviewsInput, Prisma.ListingUncheckedCreateWithoutReviewsInput>
+  where?: Prisma.ListingWhereInput
+}
+
+export type ListingUpdateToOneWithWhereWithoutReviewsInput = {
+  where?: Prisma.ListingWhereInput
+  data: Prisma.XOR<Prisma.ListingUpdateWithoutReviewsInput, Prisma.ListingUncheckedUpdateWithoutReviewsInput>
+}
+
+export type ListingUpdateWithoutReviewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
+  type?: Prisma.EnumListingTypeFieldUpdateOperationsInput | $Enums.ListingType
+  condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  course?: Prisma.CourseUpdateOneWithoutListingsNestedInput
+  seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
+  university?: Prisma.UniversityUpdateOneWithoutListingsNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutListingNestedInput
+}
+
+export type ListingUncheckedUpdateWithoutReviewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
+  type?: Prisma.EnumListingTypeFieldUpdateOperationsInput | $Enums.ListingType
+  condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  universityId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutListingNestedInput
 }
 
 export type ListingCreateManyUniversityInput = {
@@ -1049,6 +1170,7 @@ export type ListingUpdateWithoutUniversityInput = {
   course?: Prisma.CourseUpdateOneWithoutListingsNestedInput
   seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutListingNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateWithoutUniversityInput = {
@@ -1066,6 +1188,7 @@ export type ListingUncheckedUpdateWithoutUniversityInput = {
   courseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellerId?: Prisma.StringFieldUpdateOperationsInput | string
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutListingNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateManyWithoutUniversityInput = {
@@ -1115,6 +1238,7 @@ export type ListingUpdateWithoutSellerInput = {
   course?: Prisma.CourseUpdateOneWithoutListingsNestedInput
   university?: Prisma.UniversityUpdateOneWithoutListingsNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutListingNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateWithoutSellerInput = {
@@ -1132,6 +1256,7 @@ export type ListingUncheckedUpdateWithoutSellerInput = {
   courseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   universityId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutListingNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateManyWithoutSellerInput = {
@@ -1181,6 +1306,7 @@ export type ListingUpdateWithoutCourseInput = {
   seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   university?: Prisma.UniversityUpdateOneWithoutListingsNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutListingNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateWithoutCourseInput = {
@@ -1198,6 +1324,7 @@ export type ListingUncheckedUpdateWithoutCourseInput = {
   sellerId?: Prisma.StringFieldUpdateOperationsInput | string
   universityId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutListingNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateManyWithoutCourseInput = {
@@ -1223,10 +1350,12 @@ export type ListingUncheckedUpdateManyWithoutCourseInput = {
 
 export type ListingCountOutputType = {
   conversations: number
+  reviews: number
 }
 
 export type ListingCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversations?: boolean | ListingCountOutputTypeCountConversationsArgs
+  reviews?: boolean | ListingCountOutputTypeCountReviewsArgs
 }
 
 /**
@@ -1244,6 +1373,13 @@ export type ListingCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exte
  */
 export type ListingCountOutputTypeCountConversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ConversationWhereInput
+}
+
+/**
+ * ListingCountOutputType without action
+ */
+export type ListingCountOutputTypeCountReviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReviewWhereInput
 }
 
 
@@ -1266,6 +1402,7 @@ export type ListingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   university?: boolean | Prisma.Listing$universityArgs<ExtArgs>
   conversations?: boolean | Prisma.Listing$conversationsArgs<ExtArgs>
+  reviews?: boolean | Prisma.Listing$reviewsArgs<ExtArgs>
   _count?: boolean | Prisma.ListingCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["listing"]>
 
@@ -1332,6 +1469,7 @@ export type ListingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   university?: boolean | Prisma.Listing$universityArgs<ExtArgs>
   conversations?: boolean | Prisma.Listing$conversationsArgs<ExtArgs>
+  reviews?: boolean | Prisma.Listing$reviewsArgs<ExtArgs>
   _count?: boolean | Prisma.ListingCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ListingIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1352,6 +1490,7 @@ export type $ListingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     seller: Prisma.$UserPayload<ExtArgs>
     university: Prisma.$UniversityPayload<ExtArgs> | null
     conversations: Prisma.$ConversationPayload<ExtArgs>[]
+    reviews: Prisma.$ReviewPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1766,6 +1905,7 @@ export interface Prisma__ListingClient<T, Null = never, ExtArgs extends runtime.
   seller<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   university<T extends Prisma.Listing$universityArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$universityArgs<ExtArgs>>): Prisma.Prisma__UniversityClient<runtime.Types.Result.GetResult<Prisma.$UniversityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   conversations<T extends Prisma.Listing$conversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$conversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  reviews<T extends Prisma.Listing$reviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2262,6 +2402,30 @@ export type Listing$conversationsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.ConversationScalarFieldEnum | Prisma.ConversationScalarFieldEnum[]
+}
+
+/**
+ * Listing.reviews
+ */
+export type Listing$reviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Review
+   */
+  select?: Prisma.ReviewSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Review
+   */
+  omit?: Prisma.ReviewOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReviewInclude<ExtArgs> | null
+  where?: Prisma.ReviewWhereInput
+  orderBy?: Prisma.ReviewOrderByWithRelationInput | Prisma.ReviewOrderByWithRelationInput[]
+  cursor?: Prisma.ReviewWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReviewScalarFieldEnum | Prisma.ReviewScalarFieldEnum[]
 }
 
 /**

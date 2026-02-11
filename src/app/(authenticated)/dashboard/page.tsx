@@ -11,6 +11,7 @@ interface Listing {
   category: string;
   type: string;
   condition: string | null;
+  imageUrl: string | null;
   createdAt: string;
   seller: { id: string; name: string };
   course?: { id: string; courseNumber: string; name: string } | null;
@@ -38,12 +39,12 @@ interface CourseResult {
 }
 
 const CAMPUS_CATEGORIES = [
-  { value: "", label: "All" },
-  { value: "TICKETS", label: "Tickets" },
-  { value: "CLOTHING", label: "Clothing" },
-  { value: "ELECTRONICS", label: "Electronics" },
-  { value: "FURNITURE", label: "Furniture" },
-  { value: "OTHER", label: "Other" },
+  { value: "", label: "All", icon: "🏪" },
+  { value: "TICKETS", label: "Tickets", icon: "🎫" },
+  { value: "CLOTHING", label: "Clothing", icon: "👕" },
+  { value: "ELECTRONICS", label: "Electronics", icon: "💻" },
+  { value: "FURNITURE", label: "Furniture", icon: "🪑" },
+  { value: "OTHER", label: "Other", icon: "📦" },
 ];
 
 function timeAgo(dateStr: string): string {
@@ -71,6 +72,15 @@ export default function DashboardPage() {
   const [campusSearch, setCampusSearch] = useState("");
   const searchRef = useRef<HTMLDivElement>(null);
 
+  // Post form state
+  const [showPostForm, setShowPostForm] = useState(false);
+  const [newListing, setNewListing] = useState({
+    title: "", description: "", price: "", category: "TICKETS", condition: "",
+  });
+  const [posting, setPosting] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
   useEffect(() => {
     fetchEnrollments();
   }, []);
@@ -79,7 +89,6 @@ export default function DashboardPage() {
     fetchFeed();
   }, [tab, selectedCourseId, campusCategory, campusSearch]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Close search dropdown when clicking outside
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
@@ -141,6 +150,47 @@ export default function DashboardPage() {
     setCourseSearch("");
     setCourseResults([]);
     setShowSearch(false);
+    setShowPostForm(false);
+  }
+
+  function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onload = (ev) => setImagePreview(ev.target?.result as string);
+      reader.readAsDataURL(file);
+    }
+  }
+
+  async function handleCreatePost(e: React.FormEvent) {
+    e.preventDefault();
+    setPosting(true);
+
+    let imageUrl: string | null = null;
+    if (imageFile) {
+      const formData = new FormData();
+      formData.append("file", imageFile);
+      const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
+      if (uploadRes.ok) {
+        const uploadData = await uploadRes.json();
+        imageUrl = uploadData.url;
+      }
+    }
+
+    const res = await fetch("/api/marketplace", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...newListing, imageUrl }),
+    });
+    if (res.ok) {
+      setShowPostForm(false);
+      setNewListing({ title: "", description: "", price: "", category: "TICKETS", condition: "" });
+      setImageFile(null);
+      setImagePreview(null);
+      fetchFeed();
+    }
+    setPosting(false);
   }
 
   const selectedCourse = selectedCourseId
@@ -153,9 +203,23 @@ export default function DashboardPage() {
   return (
     <div className="max-w-2xl mx-auto">
       {/* Header */}
-      <div className="mb-6 animate-slide-up">
-        <h1 className="text-2xl font-bold text-gray-900">Feed</h1>
-        <p className="text-gray-500 text-sm mt-0.5">Latest offerings from your campus</p>
+      <div className="flex items-center justify-between mb-6 animate-slide-up">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Feed</h1>
+          <p className="text-gray-500 text-sm mt-0.5">Latest offerings from your campus</p>
+        </div>
+        {tab === "campus" && (
+          <button
+            onClick={() => setShowPostForm(!showPostForm)}
+            className={`px-4 py-2.5 text-sm font-semibold rounded-xl transition-all ${
+              showPostForm
+                ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                : "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-200/50 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0"
+            }`}
+          >
+            {showPostForm ? "Cancel" : "+ Post Item"}
+          </button>
+        )}
       </div>
 
       {/* Tab toggle */}
@@ -184,39 +248,135 @@ export default function DashboardPage() {
         </button>
       </div>
 
+      {/* === POST FORM (Campus tab) === */}
+      {showPostForm && tab === "campus" && (
+        <form onSubmit={handleCreatePost} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6 animate-scale-in">
+          <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+            </div>
+            Post an item for sale
+          </h3>
+
+          <div className="space-y-3">
+            <input
+              type="text"
+              required
+              placeholder="What are you selling? (e.g. 2 concert tickets, Winter jacket)"
+              value={newListing.title}
+              onChange={(e) => setNewListing({ ...newListing, title: e.target.value })}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50 hover:bg-white transition-colors text-sm"
+            />
+
+            <textarea
+              placeholder="Add a description (optional)"
+              value={newListing.description}
+              onChange={(e) => setNewListing({ ...newListing, description: e.target.value })}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50 hover:bg-white transition-colors text-sm"
+              rows={3}
+            />
+
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1.5 font-medium">Price ($)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00"
+                  value={newListing.price}
+                  onChange={(e) => setNewListing({ ...newListing, price: e.target.value })}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1.5 font-medium">Category</label>
+                <select
+                  value={newListing.category}
+                  onChange={(e) => setNewListing({ ...newListing, category: e.target.value })}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50 text-sm"
+                >
+                  <option value="TICKETS">Tickets</option>
+                  <option value="CLOTHING">Clothing</option>
+                  <option value="ELECTRONICS">Electronics</option>
+                  <option value="FURNITURE">Furniture</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1.5 font-medium">Condition</label>
+                <select
+                  value={newListing.condition}
+                  onChange={(e) => setNewListing({ ...newListing, condition: e.target.value })}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50 text-sm"
+                >
+                  <option value="">Select</option>
+                  <option value="New">New</option>
+                  <option value="Like New">Like New</option>
+                  <option value="Good">Good</option>
+                  <option value="Fair">Fair</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Image upload */}
+          <div>
+            <label className="block text-xs text-gray-500 mb-1.5 font-medium">Photo (optional)</label>
+            {imagePreview ? (
+              <div className="relative">
+                <img src={imagePreview} alt="Preview" className="w-full h-48 object-cover rounded-xl border border-gray-200" />
+                <button
+                  type="button"
+                  onClick={() => { setImageFile(null); setImagePreview(null); }}
+                  className="absolute top-2 right-2 w-7 h-7 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-indigo-300 hover:bg-indigo-50/30 transition-all">
+                <svg className="w-8 h-8 text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v13.5a1.5 1.5 0 001.5 1.5zM12.75 8.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                </svg>
+                <span className="text-xs text-gray-400">Click to add a photo</span>
+                <input type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
+              </label>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={posting}
+            className="mt-4 w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all shadow-sm hover:shadow-md disabled:opacity-50 text-sm"
+          >
+            {posting ? "Posting..." : "Post listing"}
+          </button>
+        </form>
+      )}
+
       {/* === COURSES TAB CONTROLS === */}
       {tab === "courses" && (
         <>
-          {/* Course search bar */}
           <div ref={searchRef} className="relative mb-5 animate-slide-up stagger-2">
             <div className="relative">
-              <svg
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                />
+              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
               <input
                 type="text"
                 value={courseSearch}
-                onChange={(e) => {
-                  handleCourseSearch(e.target.value);
-                  setShowSearch(true);
-                }}
+                onChange={(e) => { handleCourseSearch(e.target.value); setShowSearch(true); }}
                 onFocus={() => setShowSearch(true)}
                 placeholder="Search by course (e.g. CS 101, Organic Chemistry)..."
                 className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white hover:bg-gray-50/50 transition-colors text-sm shadow-sm"
               />
             </div>
 
-            {/* Course search dropdown */}
             {showSearch && (courseSearch.length >= 2 || searching) && (
               <div className="absolute z-20 top-full mt-2 w-full bg-white rounded-2xl border border-gray-100 shadow-xl max-h-72 overflow-y-auto animate-slide-down">
                 {searching && (
@@ -247,7 +407,6 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Course chip filters */}
           <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide animate-slide-up stagger-3">
             <button
               onClick={() => setSelectedCourseId(null)}
@@ -265,9 +424,7 @@ export default function DashboardPage() {
                 <button
                   key={enrollment.id}
                   onClick={() =>
-                    setSelectedCourseId(
-                      selectedCourseId === enrollment.courseId ? null : enrollment.courseId
-                    )
+                    setSelectedCourseId(selectedCourseId === enrollment.courseId ? null : enrollment.courseId)
                   }
                   className={`shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
                     selectedCourseId === enrollment.courseId
@@ -289,17 +446,13 @@ export default function DashboardPage() {
             </Link>
           </div>
 
-          {/* Active course filter indicator */}
           {selectedCourseId && (
             <div className="flex items-center gap-2 mb-5 animate-scale-in">
               <span className="text-sm text-gray-500">Showing posts from</span>
               <span className="text-sm font-semibold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full">
                 {selectedCourseName || "course"}
               </span>
-              <button
-                onClick={() => setSelectedCourseId(null)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
+              <button onClick={() => setSelectedCourseId(null)} className="text-gray-400 hover:text-gray-600 transition-colors">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -307,7 +460,6 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* No courses prompt */}
           {enrollments.length === 0 && !loading && (
             <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-8 text-center mb-6 animate-scale-in shadow-xl shadow-indigo-200/30">
               <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-float">
@@ -316,13 +468,8 @@ export default function DashboardPage() {
                 </svg>
               </div>
               <h2 className="text-xl font-bold text-white mb-2">Add your courses to personalize your feed</h2>
-              <p className="text-indigo-100 mb-5">
-                See what students in your classes are selling, looking for, and sharing.
-              </p>
-              <Link
-                href="/courses"
-                className="inline-block px-7 py-2.5 bg-white text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-colors shadow-lg"
-              >
+              <p className="text-indigo-100 mb-5">See what students in your classes are selling, looking for, and sharing.</p>
+              <Link href="/courses" className="inline-block px-7 py-2.5 bg-white text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-colors shadow-lg">
                 Add courses
               </Link>
             </div>
@@ -333,20 +480,9 @@ export default function DashboardPage() {
       {/* === CAMPUS TAB CONTROLS === */}
       {tab === "campus" && (
         <>
-          {/* Search bar */}
           <div className="relative mb-5 animate-slide-up stagger-2">
-            <svg
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={1.5}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-              />
+            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
             <input
               type="text"
@@ -357,18 +493,18 @@ export default function DashboardPage() {
             />
           </div>
 
-          {/* Category chips */}
           <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide animate-slide-up stagger-3">
             {CAMPUS_CATEGORIES.map((cat) => (
               <button
                 key={cat.value}
                 onClick={() => setCampusCategory(cat.value)}
-                className={`shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   campusCategory === cat.value
                     ? "bg-amber-500 text-white shadow-md shadow-amber-200"
                     : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
                 }`}
               >
+                <span className="text-sm">{cat.icon}</span>
                 {cat.label}
               </button>
             ))}
@@ -418,6 +554,14 @@ export default function DashboardPage() {
                 : "No course materials posted yet. Check back soon!"
               : "No campus listings yet. Be the first to post something!"}
           </p>
+          {tab === "campus" && (
+            <button
+              onClick={() => setShowPostForm(true)}
+              className="mt-4 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl text-sm hover:from-indigo-700 hover:to-purple-700 transition-all shadow-sm"
+            >
+              + Post an item
+            </button>
+          )}
         </div>
       ) : (
         <div className="space-y-4">
@@ -427,7 +571,6 @@ export default function DashboardPage() {
               href={`/listings/${listing.id}`}
               className={`block bg-white rounded-2xl border border-gray-100/80 overflow-hidden card-hover group animate-slide-up stagger-${Math.min(i + 1, 6)}`}
             >
-              {/* Post header */}
               <div className="flex items-center gap-3 px-5 pt-5 pb-3">
                 <div className={`w-11 h-11 rounded-full flex items-center justify-center shadow-sm ring-2 ring-white ${
                   tab === "courses"
@@ -451,45 +594,39 @@ export default function DashboardPage() {
                 </div>
                 {listing.price != null && (
                   <div className="text-right">
-                    <span className="text-lg font-bold text-green-600">${listing.price}</span>
+                    <span className="text-lg font-bold text-emerald-600">${listing.price}</span>
                   </div>
                 )}
               </div>
 
-              {/* Post body */}
+              {listing.imageUrl && (
+                <div className="px-5">
+                  <img src={listing.imageUrl} alt={listing.title} className="w-full h-48 object-cover rounded-xl" />
+                </div>
+              )}
+
               <div className="px-5 pb-4">
                 <h3 className="font-semibold text-gray-900 group-hover:text-indigo-700 transition-colors text-[17px] leading-snug">
                   {listing.title}
                 </h3>
                 {listing.description && (
-                  <p className="text-gray-500 mt-1.5 leading-relaxed text-sm line-clamp-3">
-                    {listing.description}
-                  </p>
+                  <p className="text-gray-500 mt-1.5 leading-relaxed text-sm line-clamp-3">{listing.description}</p>
                 )}
-
-                {/* Tags */}
                 <div className="flex items-center gap-2 mt-3">
-                  <span
-                    className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-                      listing.type === "SELLING"
-                        ? "bg-green-50 text-green-700"
-                        : "bg-blue-50 text-blue-700"
-                    }`}
-                  >
+                  <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                    listing.type === "SELLING" ? "bg-emerald-50 text-emerald-700" : "bg-blue-50 text-blue-700"
+                  }`}>
                     {listing.type === "SELLING" ? "For Sale" : "Looking For"}
                   </span>
                   <span className="text-xs bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full">
                     {listing.category.replace(/_/g, " ")}
                   </span>
                   {listing.condition && (
-                    <span className="text-xs bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full">
-                      {listing.condition}
-                    </span>
+                    <span className="text-xs bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full">{listing.condition}</span>
                   )}
                 </div>
               </div>
 
-              {/* Post footer */}
               <div className="border-t border-gray-50 px-5 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <span className="flex items-center gap-1.5 text-xs text-gray-400 group-hover:text-indigo-500 transition-colors">
@@ -506,9 +643,7 @@ export default function DashboardPage() {
                   </span>
                 </div>
                 {listing.course && !selectedCourseId && (
-                  <span className="text-xs text-gray-400">
-                    {listing.course.name}
-                  </span>
+                  <span className="text-xs text-gray-400">{listing.course.name}</span>
                 )}
               </div>
             </Link>

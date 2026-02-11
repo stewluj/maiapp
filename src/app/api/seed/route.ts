@@ -10,6 +10,7 @@ export async function POST() {
 
   try {
     // Clear existing data
+    await prisma.review.deleteMany();
     await prisma.message.deleteMany();
     await prisma.conversation.deleteMany();
     await prisma.listing.deleteMany();

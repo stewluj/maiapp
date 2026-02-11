@@ -74,3 +74,8 @@ export type Conversation = Prisma.ConversationModel
  * 
  */
 export type Message = Prisma.MessageModel
+/**
+ * Model Review
+ * 
+ */
+export type Review = Prisma.ReviewModel
