@@ -45,9 +45,12 @@ export default function CoursesPage() {
     setSearching(true);
     const res = await fetch(`/api/courses?search=${encodeURIComponent(query)}`);
     const data = await res.json();
-    const enrolledIds = new Set(enrollments.map((e) => e.courseId));
-    setSearchResults((data.courses || []).filter((c: Course) => !enrolledIds.has(c.id)));
+    setSearchResults(data.courses || []);
     setSearching(false);
+  }
+
+  function getEnrollmentStatus(courseId: string) {
+    return enrollments.find((e) => e.courseId === courseId);
   }
 
   async function addCourse(courseId: string, status: "TAKING" | "TOOK") {
@@ -123,38 +126,53 @@ export default function CoursesPage() {
 
         {searchResults.length > 0 && (
           <div className="mt-4 space-y-2 max-h-80 overflow-y-auto animate-slide-down">
-            {searchResults.map((course) => (
-              <div
-                key={course.id}
-                className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-indigo-200 hover:bg-indigo-50/30 transition-all group"
-              >
-                <Link href={`/courses/${course.id}`} className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 group-hover:text-indigo-700 transition-colors">
-                    {course.courseNumber} - {course.name}
-                  </p>
-                  <div className="flex items-center gap-3 mt-1">
-                    <span className="text-xs text-gray-500">{course.department}</span>
-                    <span className="text-xs text-gray-400">
-                      {course._count.listings} listings &middot; {course._count.enrollments} students
-                    </span>
+            {searchResults.map((course) => {
+              const enrolled = getEnrollmentStatus(course.id);
+              return (
+                <div
+                  key={course.id}
+                  className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-indigo-200 hover:bg-indigo-50/30 transition-all group"
+                >
+                  <Link href={`/courses/${course.id}`} className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-900 group-hover:text-indigo-700 transition-colors">
+                      {course.courseNumber} - {course.name}
+                    </p>
+                    <div className="flex items-center gap-3 mt-1">
+                      <span className="text-xs text-gray-500">{course.department}</span>
+                      <span className="text-xs text-gray-400">
+                        {course._count.listings} listings &middot; {course._count.enrollments} students
+                      </span>
+                    </div>
+                  </Link>
+                  <div className="flex gap-2 ml-4 shrink-0">
+                    {enrolled ? (
+                      <span className={`px-3 py-1.5 text-xs font-medium rounded-lg ${
+                        enrolled.status === "TAKING"
+                          ? "bg-green-100 text-green-700 border border-green-200"
+                          : "bg-gray-100 text-gray-600 border border-gray-200"
+                      }`}>
+                        {enrolled.status === "TAKING" ? "Currently Taking" : "Took Before"}
+                      </span>
+                    ) : (
+                      <>
+                        <button
+                          onClick={(e) => { e.preventDefault(); addCourse(course.id, "TAKING"); }}
+                          className="px-3.5 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white text-sm font-medium rounded-lg hover:from-indigo-700 hover:to-indigo-600 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
+                        >
+                          Add to My Courses
+                        </button>
+                        <button
+                          onClick={(e) => { e.preventDefault(); addCourse(course.id, "TOOK"); }}
+                          className="px-3.5 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-all"
+                        >
+                          Took Before
+                        </button>
+                      </>
+                    )}
                   </div>
-                </Link>
-                <div className="flex gap-2 ml-4 shrink-0">
-                  <button
-                    onClick={(e) => { e.preventDefault(); addCourse(course.id, "TAKING"); }}
-                    className="px-3.5 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white text-sm font-medium rounded-lg hover:from-indigo-700 hover:to-indigo-600 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
-                  >
-                    Add to My Courses
-                  </button>
-                  <button
-                    onClick={(e) => { e.preventDefault(); addCourse(course.id, "TOOK"); }}
-                    className="px-3.5 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-all"
-                  >
-                    Took Before
-                  </button>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 

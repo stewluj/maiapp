@@ -570,9 +570,9 @@ export type ListingSumOrderByAggregateInput = {
   price?: Prisma.SortOrder
 }
 
-export type ListingScalarRelationFilter = {
-  is?: Prisma.ListingWhereInput
-  isNot?: Prisma.ListingWhereInput
+export type ListingNullableScalarRelationFilter = {
+  is?: Prisma.ListingWhereInput | null
+  isNot?: Prisma.ListingWhereInput | null
 }
 
 export type ListingCreateNestedManyWithoutUniversityInput = {
@@ -727,10 +727,12 @@ export type ListingCreateNestedOneWithoutConversationsInput = {
   connect?: Prisma.ListingWhereUniqueInput
 }
 
-export type ListingUpdateOneRequiredWithoutConversationsNestedInput = {
+export type ListingUpdateOneWithoutConversationsNestedInput = {
   create?: Prisma.XOR<Prisma.ListingCreateWithoutConversationsInput, Prisma.ListingUncheckedCreateWithoutConversationsInput>
   connectOrCreate?: Prisma.ListingCreateOrConnectWithoutConversationsInput
   upsert?: Prisma.ListingUpsertWithoutConversationsInput
+  disconnect?: Prisma.ListingWhereInput | boolean
+  delete?: Prisma.ListingWhereInput | boolean
   connect?: Prisma.ListingWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.ListingUpdateToOneWithWhereWithoutConversationsInput, Prisma.ListingUpdateWithoutConversationsInput>, Prisma.ListingUncheckedUpdateWithoutConversationsInput>
 }

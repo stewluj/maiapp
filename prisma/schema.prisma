@@ -126,8 +126,8 @@ model Conversation {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  listingId String
-  listing   Listing @relation(fields: [listingId], references: [id])
+  listingId String?
+  listing   Listing? @relation(fields: [listingId], references: [id])
 
   participants User[]    @relation("ConversationParticipants")
   messages     Message[]

@@ -79,20 +79,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message });
   }
 
-  // Start a new conversation
-  if (!listingId || !receiverId) {
-    return NextResponse.json({ error: "listingId and receiverId are required for new conversations" }, { status: 400 });
+  // Start a new conversation (either about a listing or a direct DM)
+  if (!receiverId) {
+    return NextResponse.json({ error: "receiverId is required for new conversations" }, { status: 400 });
   }
 
   // Check if conversation already exists
   const existingConversation = await prisma.conversation.findFirst({
-    where: {
-      listingId,
-      AND: [
-        { participants: { some: { id: user.id } } },
-        { participants: { some: { id: receiverId } } },
-      ],
-    },
+    where: listingId
+      ? {
+          listingId,
+          AND: [
+            { participants: { some: { id: user.id } } },
+            { participants: { some: { id: receiverId } } },
+          ],
+        }
+      : {
+          listingId: null,
+          AND: [
+            { participants: { some: { id: user.id } } },
+            { participants: { some: { id: receiverId } } },
+          ],
+        },
   });
 
   if (existingConversation) {
@@ -117,24 +125,35 @@ export async function POST(req: NextRequest) {
   }
 
   // Create new conversation with first message
-  const conversation = await prisma.conversation.create({
-    data: {
-      listingId,
-      participants: { connect: [{ id: user.id }, { id: receiverId }] },
-      messages: {
-        create: {
-          content,
-          senderId: user.id,
-          receiverId,
+  const includeOpts = {
+    messages: { include: { sender: { select: { id: true, name: true } } } },
+    listing: { select: { id: true, title: true, price: true } },
+    participants: { select: { id: true, name: true } },
+  } as const;
+
+  const messageData = {
+    create: { content, senderId: user.id, receiverId },
+  };
+  const participantData = {
+    connect: [{ id: user.id }, { id: receiverId }],
+  };
+
+  const conversation = listingId
+    ? await prisma.conversation.create({
+        data: {
+          listing: { connect: { id: listingId } },
+          participants: participantData,
+          messages: messageData,
         },
-      },
-    },
-    include: {
-      messages: { include: { sender: { select: { id: true, name: true } } } },
-      listing: { select: { id: true, title: true, price: true } },
-      participants: { select: { id: true, name: true } },
-    },
-  });
+        include: includeOpts,
+      })
+    : await prisma.conversation.create({
+        data: {
+          participants: participantData,
+          messages: messageData,
+        },
+        include: includeOpts,
+      });
 
   return NextResponse.json({ conversation });
 }

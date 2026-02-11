@@ -245,27 +245,30 @@ export default function MarketplacePage() {
         ))}
       </div>
 
-      {/* Listings grid */}
+      {/* Listings feed */}
       {loading ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="bg-white rounded-2xl border border-gray-100/80 p-5">
-              <div className="flex gap-2 mb-3">
-                <div className="skeleton h-5 w-16" />
-                <div className="skeleton h-5 w-20" />
+        <div className="max-w-2xl mx-auto space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-white rounded-2xl border border-gray-100/80 p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="skeleton w-10 h-10 rounded-full" />
+                <div>
+                  <div className="skeleton h-4 w-24 mb-1" />
+                  <div className="skeleton h-3 w-16" />
+                </div>
               </div>
               <div className="skeleton h-5 w-3/4 mb-2" />
               <div className="skeleton h-4 w-full mb-1" />
-              <div className="skeleton h-4 w-1/2 mb-3" />
-              <div className="flex justify-between">
-                <div className="skeleton h-3 w-1/4" />
-                <div className="skeleton h-5 w-12" />
+              <div className="skeleton h-4 w-2/3 mb-4" />
+              <div className="flex gap-2">
+                <div className="skeleton h-5 w-16" />
+                <div className="skeleton h-5 w-20" />
               </div>
             </div>
           ))}
         </div>
       ) : listings.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center animate-scale-in">
+        <div className="max-w-2xl mx-auto bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center animate-scale-in">
           <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016A3.001 3.001 0 0021 9.349m-18 0a2.997 2.997 0 00.177-1.003L3.75 3h16.5l.573 5.347A3.001 3.001 0 0021 9.348" />
@@ -279,41 +282,58 @@ export default function MarketplacePage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="max-w-2xl mx-auto space-y-4">
           {listings.map((listing, i) => (
             <Link
               key={listing.id}
               href={`/listings/${listing.id}`}
-              className={`bg-white rounded-2xl border border-gray-100/80 p-5 card-hover group animate-slide-up stagger-${Math.min(i + 1, 6)}`}
+              className={`block bg-white rounded-2xl border border-gray-100/80 p-6 card-hover group animate-slide-up stagger-${Math.min(i + 1, 6)}`}
             >
-              <div className="flex items-center gap-2 mb-3">
+              {/* Seller row */}
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-9 h-9 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-full flex items-center justify-center shadow-sm">
+                  <span className="text-white font-bold text-xs">{listing.seller.name.charAt(0)}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900">{listing.seller.name}</p>
+                  <p className="text-xs text-gray-400">
+                    {listing.course ? listing.course.courseNumber : "General"}
+                    {" · "}
+                    {new Date(listing.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                  </p>
+                </div>
+                {listing.price != null && (
+                  <span className="text-lg font-bold text-green-600 bg-green-50 px-3 py-1 rounded-xl">
+                    ${listing.price}
+                  </span>
+                )}
+              </div>
+
+              {/* Content */}
+              <h3 className="font-semibold text-gray-900 group-hover:text-indigo-700 transition-colors text-lg">
+                {listing.title}
+              </h3>
+              {listing.description && (
+                <p className="text-gray-500 mt-1.5 leading-relaxed line-clamp-3">{listing.description}</p>
+              )}
+
+              {/* Tags */}
+              <div className="flex items-center gap-2 mt-4">
                 <span
-                  className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${
+                  className={`text-xs font-medium px-2.5 py-1 rounded-full ${
                     listing.type === "SELLING"
                       ? "bg-green-100 text-green-700"
                       : "bg-blue-100 text-blue-700"
                   }`}
                 >
-                  {listing.type === "SELLING" ? "Selling" : "Looking for"}
+                  {listing.type === "SELLING" ? "For Sale" : "Looking For"}
                 </span>
-                <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-full">
+                <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">
                   {listing.category.replace(/_/g, " ")}
                 </span>
-              </div>
-              <h3 className="font-semibold text-gray-900 truncate group-hover:text-indigo-700 transition-colors">
-                {listing.title}
-              </h3>
-              {listing.description && (
-                <p className="text-sm text-gray-500 mt-1 line-clamp-2">{listing.description}</p>
-              )}
-              <div className="flex items-center justify-between mt-4">
-                <span className="text-xs text-gray-400">
-                  {listing.seller.name}
-                  {listing.course && ` · ${listing.course.courseNumber}`}
-                </span>
-                {listing.price != null && (
-                  <span className="font-bold text-green-600 bg-green-50 px-2.5 py-1 rounded-lg text-sm">
-                    ${listing.price}
+                {listing.condition && (
+                  <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">
+                    {listing.condition}
                   </span>
                 )}
               </div>
