@@ -1,6 +1,7 @@
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import AppShell from "@/components/AppShell";
+import InstallPrompt from "@/components/InstallPrompt";
 
 export default async function AuthenticatedLayout({
   children,
@@ -22,6 +23,7 @@ export default async function AuthenticatedLayout({
       }}
     >
       {children}
+      <InstallPrompt />
     </AppShell>
   );
 }

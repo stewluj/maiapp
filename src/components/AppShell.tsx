@@ -123,7 +123,9 @@ export default function AppShell({ children, user }: AppShellProps) {
       </header>
 
       {/* Mobile nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 glass border-t border-gray-200/50 z-50">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 glass border-t border-gray-200/50 z-50 no-select"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+      >
         <div className="flex justify-around py-1">
           {navItems.map((item) => {
             const isActive = pathname.startsWith(item.href);
