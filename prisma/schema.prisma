@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+
+datasource db {
+  provider = "sqlite"
+}
+
+model University {
+  id          String   @id @default(uuid())
+  name        String
+  emailDomain String   @unique // e.g. "harvard.edu"
+  logoUrl     String?
+  createdAt   DateTime @default(now())
+
+  courses  Course[]
+  users    User[]
+  listings Listing[]
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  name          String
+  passwordHash  String
+  emailVerified Boolean  @default(false)
+  verifyToken   String?
+  createdAt     DateTime @default(now())
+
+  universityId String
+  university   University @relation(fields: [universityId], references: [id])
+
+  enrollments  UserCourse[]
+  listings     Listing[]
+  sentMessages Message[]    @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  conversations    Conversation[] @relation("ConversationParticipants")
+}
+
+model Course {
+  id           String   @id @default(uuid())
+  name         String   // e.g. "Introduction to Computer Science"
+  courseNumber  String   // e.g. "CS50"
+  department   String?
+  createdAt    DateTime @default(now())
+
+  universityId String
+  university   University @relation(fields: [universityId], references: [id])
+
+  enrollments UserCourse[]
+  listings    Listing[]
+
+  @@unique([universityId, courseNumber])
+}
+
+model UserCourse {
+  id     String           @id @default(uuid())
+  status UserCourseStatus @default(TAKING)
+
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+enum UserCourseStatus {
+  TAKING
+  TOOK
+}
+
+model Listing {
+  id          String      @id @default(uuid())
+  title       String
+  description String?
+  price       Float?
+  category    ListingCategory
+  type        ListingType // SELLING or LOOKING_FOR
+  condition   String?     // "New", "Like New", "Good", "Fair"
+  imageUrl    String?
+  status      ListingStatus @default(ACTIVE)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  courseId String?
+  course   Course? @relation(fields: [courseId], references: [id])
+  sellerId String
+  seller   User   @relation(fields: [sellerId], references: [id])
+
+  // For general marketplace (non-course items)
+  universityId String?
+  university   University? @relation(fields: [universityId], references: [id])
+
+  conversations Conversation[]
+}
+
+enum ListingCategory {
+  TEXTBOOK
+  NOTES
+  LAB_EQUIPMENT
+  CALCULATOR
+  STUDY_GUIDE
+  TICKETS
+  CLOTHING
+  ELECTRONICS
+  FURNITURE
+  OTHER
+}
+
+enum ListingType {
+  SELLING
+  LOOKING_FOR
+}
+
+enum ListingStatus {
+  ACTIVE
+  SOLD
+  CLOSED
+}
+
+model Conversation {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  listingId String
+  listing   Listing @relation(fields: [listingId], references: [id])
+
+  participants User[]    @relation("ConversationParticipants")
+  messages     Message[]
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+
+  senderId String
+  sender   User   @relation("SentMessages", fields: [senderId], references: [id])
+  receiverId String
+  receiver   User   @relation("ReceivedMessages", fields: [receiverId], references: [id])
+
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+}
