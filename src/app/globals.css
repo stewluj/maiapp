@@ -136,6 +136,15 @@ body {
   animation: blob 8s ease-in-out infinite;
 }
 
+/* ---- Hide scrollbar for horizontal scroll ---- */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* ---- Smooth page transitions ---- */
 .page-enter {
   animation: slide-up 0.4s ease-out both;
