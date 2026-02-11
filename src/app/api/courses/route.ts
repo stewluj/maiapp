@@ -16,9 +16,9 @@ export async function GET(req: NextRequest) {
       universityId: user.universityId,
       OR: search
         ? [
-            { name: { contains: search } },
-            { courseNumber: { contains: search } },
-            { department: { contains: search } },
+            { name: { contains: search, mode: "insensitive" as const } },
+            { courseNumber: { contains: search, mode: "insensitive" as const } },
+            { department: { contains: search, mode: "insensitive" as const } },
           ]
         : undefined,
     },

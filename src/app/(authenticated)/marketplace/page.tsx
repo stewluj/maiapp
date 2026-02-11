@@ -76,6 +76,7 @@ export default function MarketplacePage() {
     setLoading(true);
     const params = new URLSearchParams();
     if (category) params.set("category", category);
+    if (search) params.set("search", search);
     const res = await fetch(`/api/listings?${params}`);
     const data = await res.json();
     setCourseListings(data.listings || []);
@@ -157,7 +158,7 @@ export default function MarketplacePage() {
       {/* Tabs */}
       <div className="flex gap-1 bg-gray-100/80 p-1 rounded-xl w-fit mb-6 animate-slide-up stagger-1">
         <button
-          onClick={() => { setTab("courses"); setCategory(""); }}
+          onClick={() => { setTab("courses"); setCategory(""); setSearch(""); }}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
             tab === "courses" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-900"
           }`}
@@ -168,7 +169,7 @@ export default function MarketplacePage() {
           Course Materials
         </button>
         <button
-          onClick={() => { setTab("general"); setCategory(""); }}
+          onClick={() => { setTab("general"); setCategory(""); setSearch(""); }}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
             tab === "general" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-900"
           }`}
@@ -290,21 +291,19 @@ export default function MarketplacePage() {
         </form>
       )}
 
-      {/* Search for general marketplace */}
-      {tab === "general" && (
-        <div className="relative mb-5 animate-slide-up stagger-1">
-          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-          </svg>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search items..."
-            className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white hover:bg-gray-50/50 transition-colors text-sm shadow-sm"
-          />
-        </div>
-      )}
+      {/* Search */}
+      <div className="relative mb-5 animate-slide-up stagger-1">
+        <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+        </svg>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={tab === "courses" ? "Search course materials (e.g. bio, CS50, calculus)..." : "Search items..."}
+          className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white hover:bg-gray-50/50 transition-colors text-sm shadow-sm"
+        />
+      </div>
 
       {/* Category filters */}
       <div className="flex gap-2 mb-5 flex-wrap animate-slide-up stagger-2">

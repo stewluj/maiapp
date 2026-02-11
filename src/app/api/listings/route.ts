@@ -13,11 +13,17 @@ export async function GET(req: NextRequest) {
   const type = req.nextUrl.searchParams.get("type");
   const category = req.nextUrl.searchParams.get("category");
   const mine = req.nextUrl.searchParams.get("mine");
+  const search = req.nextUrl.searchParams.get("search");
 
-  const where: Record<string, unknown> = { status: "ACTIVE" };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const where: any = { status: "ACTIVE" };
 
   if (courseId) {
     where.courseId = courseId;
+  } else {
+    // Only show listings from the user's university
+    where.course = { universityId: user.universityId };
+    where.NOT = { courseId: null };
   }
 
   if (type && ["SELLING", "LOOKING_FOR"].includes(type)) {
@@ -30,6 +36,16 @@ export async function GET(req: NextRequest) {
 
   if (mine === "true") {
     where.sellerId = user.id;
+  }
+
+  if (search) {
+    where.OR = [
+      { title: { contains: search, mode: "insensitive" } },
+      { description: { contains: search, mode: "insensitive" } },
+      { course: { name: { contains: search, mode: "insensitive" } } },
+      { course: { courseNumber: { contains: search, mode: "insensitive" } } },
+      { course: { department: { contains: search, mode: "insensitive" } } },
+    ];
   }
 
   const listings = await prisma.listing.findMany({
