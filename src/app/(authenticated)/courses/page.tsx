@@ -25,6 +25,12 @@ export default function CoursesPage() {
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
 
+  // Add course form state
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newCourse, setNewCourse] = useState({ courseNumber: "", name: "", department: "" });
+  const [addingCourse, setAddingCourse] = useState(false);
+  const [addError, setAddError] = useState("");
+
   useEffect(() => {
     fetchEnrollments();
   }, []);
@@ -73,6 +79,29 @@ export default function CoursesPage() {
       body: JSON.stringify({ courseId }),
     });
     await fetchEnrollments();
+  }
+
+  async function handleCreateCourse(e: React.FormEvent) {
+    e.preventDefault();
+    setAddingCourse(true);
+    setAddError("");
+    const res = await fetch("/api/courses/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newCourse),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      // Auto-add the new course to the user's enrollment
+      await addCourse(data.course.id, "TAKING");
+      setNewCourse({ courseNumber: "", name: "", department: "" });
+      setShowAddForm(false);
+      setSearch("");
+      setSearchResults([]);
+    } else {
+      setAddError(data.error || "Failed to add course");
+    }
+    setAddingCourse(false);
   }
 
   const takingCourses = enrollments.filter((e) => e.status === "TAKING");
@@ -177,8 +206,86 @@ export default function CoursesPage() {
         )}
 
         {search.length >= 2 && searchResults.length === 0 && !searching && (
-          <div className="mt-4 text-center py-4">
-            <p className="text-sm text-gray-500">No matching courses found.</p>
+          <div className="mt-4">
+            {!showAddForm ? (
+              <div className="text-center py-6 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">
+                <p className="text-sm text-gray-600 mb-1">No matching courses found for &ldquo;{search}&rdquo;</p>
+                <p className="text-xs text-gray-400 mb-3">Can&apos;t find your course? Add it yourself!</p>
+                <button
+                  onClick={() => {
+                    setShowAddForm(true);
+                    setNewCourse({ ...newCourse, courseNumber: search.toUpperCase() });
+                  }}
+                  className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all shadow-sm hover:shadow-md"
+                >
+                  + Add &ldquo;{search.toUpperCase()}&rdquo; as a new course
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleCreateCourse} className="bg-white rounded-xl border border-indigo-200 p-5 animate-scale-in">
+                <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                  <div className="w-7 h-7 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
+                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                  </div>
+                  Add a new course
+                </h3>
+                {addError && (
+                  <div className="mb-3 p-2.5 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">{addError}</div>
+                )}
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1 font-medium">Course Number *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. CS101, MATH200"
+                      value={newCourse.courseNumber}
+                      onChange={(e) => setNewCourse({ ...newCourse, courseNumber: e.target.value })}
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1 font-medium">Course Name *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Introduction to Computer Science"
+                      value={newCourse.name}
+                      onChange={(e) => setNewCourse({ ...newCourse, name: e.target.value })}
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1 font-medium">Department (optional)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Computer Science, Mathematics"
+                      value={newCourse.department}
+                      onChange={(e) => setNewCourse({ ...newCourse, department: e.target.value })}
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50 text-sm"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-4">
+                  <button
+                    type="submit"
+                    disabled={addingCourse}
+                    className="flex-1 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-sm text-sm disabled:opacity-50"
+                  >
+                    {addingCourse ? "Adding..." : "Add Course"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowAddForm(false); setAddError(""); }}
+                    className="px-4 py-2.5 bg-gray-100 text-gray-600 font-medium rounded-lg hover:bg-gray-200 transition-all text-sm"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         )}
       </div>

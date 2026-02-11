@@ -51,12 +51,12 @@ export default async function Home() {
             </div>
           </div>
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 leading-tight mb-6 animate-slide-up stagger-1">
-            Your campus marketplace for
-            <span className="gradient-text"> everything academic</span>
+            The student marketplace for
+            <span className="gradient-text"> literally everything</span>
           </h1>
           <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto animate-slide-up stagger-2">
-            Buy and sell textbooks, lab equipment, notes, and more with students at your university.
-            Add your courses and instantly find what you need.
+            Textbooks, furniture, concert tickets, electronics, clothing, sublets &mdash; if a student is selling it, you&apos;ll find it here.
+            Plus, add your courses to find class-specific materials instantly.
           </p>
           <div className="flex gap-4 justify-center animate-slide-up stagger-3">
             <Link
@@ -80,9 +80,9 @@ export default async function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Course-Aware</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Course-Linked</h3>
             <p className="text-gray-600 leading-relaxed">
-              Add your courses and see exactly what materials are available. Textbooks, notes, lab equipment - all organized by class.
+              Add your courses to find class-specific materials. But that&apos;s just the start &mdash; browse everything from concert tickets to dorm furniture.
             </p>
           </div>
 
@@ -95,7 +95,7 @@ export default async function Home() {
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Local & Instant</h3>
             <p className="text-gray-600 leading-relaxed">
-              Everything is from students at your campus. Chat directly, pick a meeting spot, and get your materials today.
+              Everything is from students at your campus. Chat directly, meet up, and buy or sell anything &mdash; no shipping needed.
             </p>
           </div>
 
@@ -114,17 +114,22 @@ export default async function Home() {
 
         {/* Categories */}
         <div className="mt-28 text-center animate-slide-up stagger-5">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">What you can find</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">Not just textbooks</h2>
+          <p className="text-gray-500 mb-8 max-w-lg mx-auto">Students buy and sell everything on MAI. If it&apos;s on campus, it&apos;s on here.</p>
           <div className="flex flex-wrap gap-3 justify-center">
             {[
               { name: "Textbooks", icon: "📚" },
+              { name: "Tickets & Events", icon: "🎫" },
+              { name: "Electronics", icon: "💻" },
+              { name: "Furniture", icon: "🪑" },
+              { name: "Clothing & Merch", icon: "👕" },
               { name: "Lab Equipment", icon: "🔬" },
               { name: "Calculators", icon: "🔢" },
               { name: "Notes & Study Guides", icon: "📝" },
-              { name: "Tickets", icon: "🎫" },
-              { name: "Clothing", icon: "👕" },
-              { name: "Electronics", icon: "💻" },
-              { name: "Furniture", icon: "🪑" },
+              { name: "Dorm Essentials", icon: "🛏️" },
+              { name: "Bikes & Scooters", icon: "🚲" },
+              { name: "Sports Gear", icon: "🏀" },
+              { name: "Kitchen & Appliances", icon: "🍳" },
             ].map((item) => (
               <span
                 key={item.name}
@@ -141,7 +146,7 @@ export default async function Home() {
       {/* Footer */}
       <footer className="border-t border-gray-200/50 py-8">
         <div className="max-w-6xl mx-auto px-6 text-center text-sm text-gray-400">
-          MAI - The campus marketplace for academic materials
+          MAI - The campus marketplace for everything students need
         </div>
       </footer>
     </div>

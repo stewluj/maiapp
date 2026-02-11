@@ -206,7 +206,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between mb-6 animate-slide-up">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Feed</h1>
-          <p className="text-gray-500 text-sm mt-0.5">Latest offerings from your campus</p>
+          <p className="text-gray-500 text-sm mt-0.5">Everything for sale on your campus</p>
         </div>
         {tab === "campus" && (
           <button
@@ -386,7 +386,15 @@ export default function DashboardPage() {
                   </div>
                 )}
                 {!searching && courseResults.length === 0 && courseSearch.length >= 2 && (
-                  <div className="p-4 text-sm text-gray-500 text-center">No courses found.</div>
+                  <div className="p-4 text-center">
+                    <p className="text-sm text-gray-500 mb-2">No courses found for &ldquo;{courseSearch}&rdquo;</p>
+                    <Link
+                      href="/courses"
+                      className="inline-block text-xs font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      Go to Courses to add it
+                    </Link>
+                  </div>
                 )}
                 {courseResults.map((course) => (
                   <button

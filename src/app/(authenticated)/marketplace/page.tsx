@@ -138,7 +138,7 @@ export default function MarketplacePage() {
       <div className="flex items-center justify-between mb-8 animate-slide-up">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Marketplace</h1>
-          <p className="text-gray-500 mt-1">Browse items from your campus community</p>
+          <p className="text-gray-500 mt-1">Buy &amp; sell anything with students on your campus</p>
         </div>
         {tab === "general" && (
           <button
